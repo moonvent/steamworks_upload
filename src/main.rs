@@ -54,6 +54,7 @@ enum Request {
     Audit,
     Read,
     Pull,
+    ExportLocalization,
     Plan,
     Fill,
     Save,
@@ -260,6 +261,7 @@ fn parse_request(line: &str, json_mode: bool) -> Result<Request> {
         "audit" => Ok(Request::Audit),
         "read" => Ok(Request::Read),
         "pull" => Ok(Request::Pull),
+        "export-localization" => Ok(Request::ExportLocalization),
         "plan" => Ok(Request::Plan),
         "fill" => Ok(Request::Fill),
         "save" => Ok(Request::Save),
@@ -309,10 +311,17 @@ async fn handle(
 ) -> Result<Value> {
     match request {
         Request::Help => Ok(
-            json!({"commands":["audit","fields basic","tab description","read","pull","plan","fill","save","discard","inspect","self-test","quit"],"json_examples":[{"command":"fields","tab":"basic"},{"command":"get","tab":"basic","field":"name:app[name]"},{"command":"set","tab":"basic","field":"name:app[name]","value":"Your Game"}],"save":"Saves a draft only. Publish stays manual."}),
+            json!({"commands":["audit","fields basic","tab description","read","pull","export-localization","plan","fill","save","discard","inspect","self-test","quit"],"json_examples":[{"command":"fields","tab":"basic"},{"command":"get","tab":"basic","field":"name:app[name]"},{"command":"set","tab":"basic","field":"name:app[name]","value":"Your Game"}],"save":"Saves a draft only. Publish stays manual."}),
         ),
         Request::Audit => browser::audit(driver, config.app_id).await,
         Request::Fields { tab } => browser::fields(driver, config.app_id, &tab).await,
+        Request::ExportLocalization => {
+            ensure!(
+                pending.store.is_none() && pending.fields.is_empty(),
+                "Save or discard edits before exporting localization"
+            );
+            browser::export_localization(driver, config.app_id).await
+        }
         Request::Tab { tab } => {
             browser::tab(driver, config.app_id, &tab).await?;
             Ok(json!({"tab":tab}))

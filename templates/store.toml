@@ -66,6 +66,13 @@ short_value = 'input[name="app[content][short_description][{language}]"]'
 about_value = 'input[name="app[content][about][{language}]"]'
 current_language = "#app_content_short_description__currentlanguage"
 
+# Reviewed on the Localization tab: export only, no form submission.
+[localization_download]
+format = "#tab_localization_content select#downloadLocFormat"
+language = "#tab_localization_content select#downloadLocLanguage"
+button = "#tab_localization_content button#downloadLocButton"
+button_text = "Download Localization"
+
 [fields."name:app[content][links][website]"]
 tab = "basic"
 selector = "input[name=\"app[content][links][website]\"]"

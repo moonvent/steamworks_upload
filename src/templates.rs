@@ -13,6 +13,15 @@ pub struct Templates {
     pub tabs: BTreeMap<String, Tab>,
     pub fields: BTreeMap<String, Field>,
     pub localization: Localization,
+    pub localization_download: LocalizationDownload,
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LocalizationDownload {
+    pub format: String,
+    pub language: String,
+    pub button: String,
+    pub button_text: String,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]

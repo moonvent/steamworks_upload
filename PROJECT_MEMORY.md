@@ -44,6 +44,9 @@ Rust CLI версии 0.3.0. Это терминальная утилита, GUI
   checkbox/radio при наличии соответствующего шаблона).
 - Черновик сохраняется через штатную кнопку Save, затем страница перечитывается.
 - Приватные бэкапы, снимки, JSONL-журнал и HTML-лента операции.
+- `export-localization`: штатный JSON-экспорт Localization → All Languages,
+  проверка контролов и структуры скачанного файла, отдельный приватный каталог
+  `apps/<app-id>/localization/<timestamp>/`. Проверен живым скачиванием без Save.
 - Нативный MP4 через CDP `Page.startScreenRecording`/`stopScreenRecording` и IO stream.
   Работоспособность проверена на установленном Chrome. При отсутствии поддержки
   видео явно сообщается; скриншоты остаются.
@@ -110,6 +113,7 @@ Rust CLI версии 0.3.0. Это терминальная утилита, GUI
 {"command":"fields","tab":"basic"}
 {"command":"read"}
 {"command":"pull"}
+{"command":"export-localization"}
 {"command":"plan"}
 {"command":"fill"}
 {"command":"get","tab":"basic","field":"name:app[name]"}

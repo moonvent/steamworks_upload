@@ -82,6 +82,9 @@ keep those paths outside the source tree when sharing it.
 - `read`: read the base title and descriptions for the configured language.
 - `pull`: copy current texts into your private local config, backing up the previous
   config. The description path is in `description_file` (Steam BBCode).
+- `export-localization`: download the store editor's JSON export with All Languages
+  into a new private `apps/<app-id>/localization/<timestamp>/` directory. Validates
+  the export controls and downloaded JSON; does not save or publish the store page.
 - `plan`: compare local texts against the browser.
 - `fill`: fill the base title and descriptions, check readback, do not save.
 - `save`: save the pending draft and reload to verify persistence. Never publishes.

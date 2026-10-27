@@ -12,6 +12,102 @@ pub struct Change {
     pub after: Value,
 }
 
+pub async fn export_localization(driver: &WebDriver, app: u32) -> Result<Value> {
+    tab(driver, app, "localization").await?;
+    let template = crate::templates::load()?;
+    let recipe = &template.localization_download;
+    let format = crate::templates::unique(driver, &recipe.format).await?;
+    let language = crate::templates::unique(driver, &recipe.language).await?;
+    let button = crate::templates::unique(driver, &recipe.button).await?;
+    for select in [&format, &language] {
+        ensure!(
+            select.tag_name().await? == "select"
+                && select.is_displayed().await?
+                && select.is_enabled().await?,
+            "Template mismatch: localization export select"
+        );
+    }
+    ensure!(
+        button.tag_name().await? == "button"
+            && button.attr("type").await?.as_deref() == Some("button")
+            && button.text().await?.trim() == recipe.button_text
+            && button.is_displayed().await?
+            && button.is_enabled().await?,
+        "Template mismatch: localization export button"
+    );
+    SelectElement::new(&format)
+        .await?
+        .select_by_value("json")
+        .await?;
+    SelectElement::new(&language)
+        .await?
+        .select_by_value("all")
+        .await?;
+    ensure!(
+        format.value().await?.as_deref() == Some("json")
+            && language.value().await?.as_deref() == Some("all"),
+        "Localization export selection readback failed"
+    );
+    let stamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)?
+        .as_nanos();
+    let dir = paths::root()?
+        .join("apps")
+        .join(app.to_string())
+        .join("localization")
+        .join(stamp.to_string());
+    paths::private_dir(&dir)?;
+    driver
+        .cdp()
+        .send_raw(
+            "Browser.setDownloadBehavior",
+            json!({"behavior":"allow","downloadPath":dir}),
+        )
+        .await?;
+    button.click().await?;
+    for _ in 0..120 {
+        tokio::time::sleep(std::time::Duration::from_millis(250)).await;
+        let files: Vec<_> = std::fs::read_dir(&dir)?.collect::<std::io::Result<Vec<_>>>()?;
+        if files.len() != 1 {
+            continue;
+        }
+        let path = files[0].path();
+        if path.extension().and_then(|e| e.to_str()) != Some("json") {
+            continue;
+        }
+        let bytes = std::fs::read(&path)?;
+        let Ok(document) = serde_json::from_slice::<Value>(&bytes) else {
+            continue;
+        };
+        let languages = document["languages"]
+            .as_object()
+            .context("Localization download has no languages object")?;
+        ensure!(
+            !languages.is_empty()
+                && languages.values().all(|fields| fields
+                    .as_object()
+                    .is_some_and(|fields| fields.values().all(Value::is_string))),
+            "Localization download has invalid language fields"
+        );
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600))?;
+        }
+        crate::recording::event(
+            "localization.downloaded",
+            json!({"app_id":app,"format":"json","language":"all","path":path,"bytes":bytes.len()}),
+        )?;
+        return Ok(
+            json!({"downloaded":true,"app_id":app,"format":"json","language":"all","path":path,"bytes":bytes.len(),"saved":false,"published":false}),
+        );
+    }
+    anyhow::bail!(
+        "No completed JSON localization download within 30 seconds; inspect private directory {}",
+        dir.display()
+    )
+}
+
 pub async fn tab(driver: &WebDriver, app: u32, name: &str) -> Result<WebElement> {
     store::identity(driver, app).await?;
     let template = crate::templates::load()?;
