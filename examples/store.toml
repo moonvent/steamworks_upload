@@ -1,0 +1,6 @@
+# Placeholder AppID. Use your own app via ./run.sh --app YOUR_APP_ID.
+app_id = 123456
+language = "english"
+name = "Your Game"
+short_description = "Replace this example with a description of your game."
+description_file = "about.bbcode"

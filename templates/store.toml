@@ -1,0 +1,881 @@
+version = 1
+name = "Steamworks store editor"
+
+[page]
+origin = "https://partner.steamgames.com"
+path_prefix = "/admin/game/edit/"
+form_selector = "form#gameform"
+save_path_prefix = "/admin/game/save/"
+
+[tabs.basic]
+nav = "#tab_basic"
+content = "#tab_basic_content"
+save = "input[type='submit'][value='Save']"
+[tabs.description]
+nav = "#tab_description"
+content = "#tab_description_content"
+save = "input[type='submit'][value='Save']"
+[tabs.ratings]
+nav = "#tab_ratings"
+content = "#tab_ratings_content"
+[tabs.earlyaccess]
+nav = "#tab_earlyaccess"
+content = "#tab_earlyaccess_content"
+save = "input[type='submit'][value='Save']"
+[tabs.graphicalassets]
+nav = "#tab_graphicalassets"
+content = "#tab_graphicalassets_content"
+[tabs.movies]
+nav = "#tab_movies"
+content = "#tab_movies_content"
+[tabs.specialsettings]
+nav = "#tab_specialsettings"
+content = "#tab_specialsettings_content"
+save = "input[type='submit'][value='Save Changes']"
+[tabs.localization]
+nav = "#tab_localization"
+content = "#tab_localization_content"
+[tabs.publish]
+nav = "#tab_publish"
+content = "#tab_publish_content"
+read_only = true
+
+[fields.name]
+tab = "basic"
+selector = 'input[name="app[name]"]'
+tag = "input"
+input_type = "text"
+expected_name = "app[name]"
+[fields.short_description]
+tab = "description"
+selector = "#app_content_short_description__textarea"
+expected_id = "app_content_short_description__textarea"
+tag = "textarea"
+[fields.language]
+tab = "description"
+selector = "#app_content_short_description__select"
+expected_id = "app_content_short_description__select"
+tag = "select"
+[fields.about]
+tab = "description"
+selector = "[data-featuretarget=\"storeadmin-app-description-editor\"][data-props*='\"editorType\":\"aboutthegame\"']"
+tag = "div"
+
+[localization]
+short_value = 'input[name="app[content][short_description][{language}]"]'
+about_value = 'input[name="app[content][about][{language}]"]'
+current_language = "#app_content_short_description__currentlanguage"
+
+[fields."name:app[content][links][website]"]
+tab = "basic"
+selector = "input[name=\"app[content][links][website]\"]"
+tag = "input"
+expected_name = "app[content][links][website]"
+input_type = "text"
+
+[fields."name:app[content][links][forums]"]
+tab = "basic"
+selector = "input[name=\"app[content][links][forums]\"]"
+tag = "input"
+expected_name = "app[content][links][forums]"
+input_type = "text"
+
+[fields."name:app[content][links][stats]"]
+tab = "basic"
+selector = "input[name=\"app[content][links][stats]\"]"
+tag = "input"
+expected_name = "app[content][links][stats]"
+input_type = "text"
+
+[fields."name:app[content][links][online_manual]"]
+tab = "basic"
+selector = "input[name=\"app[content][links][online_manual]\"]"
+tag = "input"
+expected_name = "app[content][links][online_manual]"
+input_type = "text"
+
+[fields."name:app[content][links][health_warning]"]
+tab = "basic"
+selector = "input[name=\"app[content][links][health_warning]\"]"
+tag = "input"
+expected_name = "app[content][links][health_warning]"
+input_type = "text"
+
+[fields."name:app[content][links][privacy_policy]"]
+tab = "basic"
+selector = "input[name=\"app[content][links][privacy_policy]\"]"
+tag = "input"
+expected_name = "app[content][links][privacy_policy]"
+input_type = "text"
+
+[fields."name:app[content][links][steam_deck_blog_url]"]
+tab = "basic"
+selector = "input[name=\"app[content][links][steam_deck_blog_url]\"]"
+tag = "input"
+expected_name = "app[content][links][steam_deck_blog_url]"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_windows_min_osversion__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_min_osversion__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_min_osversion__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_windows_min_processor__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_min_processor__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_min_processor__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][windows][min][memory][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][windows][min][memory][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][windows][min][memory][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][windows][min][memory][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][windows][min][memory][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][windows][min][memory][units]"
+
+[fields."id:app_content_sysreqs_windows_min_graphics__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_min_graphics__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_min_graphics__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][windows][min][directx]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][windows][min][directx]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][windows][min][directx]"
+
+[fields."name:app[content][sysreqs][windows][min][diskspace][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][windows][min][diskspace][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][windows][min][diskspace][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][windows][min][diskspace][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][windows][min][diskspace][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][windows][min][diskspace][units]"
+
+[fields."id:app_content_sysreqs_windows_min_soundcard__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_min_soundcard__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_min_soundcard__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_windows_min_vrsupport__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_min_vrsupport__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_min_vrsupport__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_windows_min_notes__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_min_notes__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_min_notes__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_windows_rec_osversion__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_rec_osversion__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_rec_osversion__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_windows_rec_processor__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_rec_processor__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_rec_processor__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][windows][rec][memory][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][windows][rec][memory][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][windows][rec][memory][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][windows][rec][memory][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][windows][rec][memory][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][windows][rec][memory][units]"
+
+[fields."id:app_content_sysreqs_windows_rec_graphics__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_rec_graphics__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_rec_graphics__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][windows][rec][directx]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][windows][rec][directx]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][windows][rec][directx]"
+
+[fields."name:app[content][sysreqs][windows][rec][diskspace][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][windows][rec][diskspace][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][windows][rec][diskspace][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][windows][rec][diskspace][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][windows][rec][diskspace][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][windows][rec][diskspace][units]"
+
+[fields."id:app_content_sysreqs_windows_rec_soundcard__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_rec_soundcard__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_rec_soundcard__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_windows_rec_vrsupport__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_rec_vrsupport__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_rec_vrsupport__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_windows_rec_notes__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_windows_rec_notes__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_windows_rec_notes__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_mac_min_osversion__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_mac_min_osversion__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_mac_min_osversion__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_mac_min_processor__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_mac_min_processor__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_mac_min_processor__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][mac][min][memory][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][mac][min][memory][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][mac][min][memory][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][mac][min][memory][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][mac][min][memory][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][mac][min][memory][units]"
+
+[fields."id:app_content_sysreqs_mac_min_graphics__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_mac_min_graphics__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_mac_min_graphics__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][mac][min][diskspace][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][mac][min][diskspace][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][mac][min][diskspace][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][mac][min][diskspace][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][mac][min][diskspace][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][mac][min][diskspace][units]"
+
+[fields."id:app_content_sysreqs_mac_min_soundcard__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_mac_min_soundcard__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_mac_min_soundcard__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_mac_min_notes__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_mac_min_notes__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_mac_min_notes__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_mac_rec_osversion__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_mac_rec_osversion__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_mac_rec_osversion__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_mac_rec_processor__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_mac_rec_processor__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_mac_rec_processor__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][mac][rec][memory][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][mac][rec][memory][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][mac][rec][memory][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][mac][rec][memory][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][mac][rec][memory][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][mac][rec][memory][units]"
+
+[fields."id:app_content_sysreqs_mac_rec_graphics__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_mac_rec_graphics__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_mac_rec_graphics__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][mac][rec][diskspace][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][mac][rec][diskspace][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][mac][rec][diskspace][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][mac][rec][diskspace][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][mac][rec][diskspace][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][mac][rec][diskspace][units]"
+
+[fields."id:app_content_sysreqs_mac_rec_soundcard__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_mac_rec_soundcard__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_mac_rec_soundcard__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_mac_rec_notes__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_mac_rec_notes__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_mac_rec_notes__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_linux_min_osversion__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_min_osversion__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_min_osversion__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_linux_min_processor__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_min_processor__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_min_processor__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][linux][min][memory][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][linux][min][memory][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][linux][min][memory][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][linux][min][memory][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][linux][min][memory][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][linux][min][memory][units]"
+
+[fields."id:app_content_sysreqs_linux_min_graphics__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_min_graphics__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_min_graphics__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][linux][min][diskspace][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][linux][min][diskspace][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][linux][min][diskspace][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][linux][min][diskspace][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][linux][min][diskspace][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][linux][min][diskspace][units]"
+
+[fields."id:app_content_sysreqs_linux_min_soundcard__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_min_soundcard__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_min_soundcard__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_linux_min_vrsupport__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_min_vrsupport__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_min_vrsupport__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_linux_min_notes__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_min_notes__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_min_notes__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_linux_rec_osversion__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_rec_osversion__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_rec_osversion__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_linux_rec_processor__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_rec_processor__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_rec_processor__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][linux][rec][memory][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][linux][rec][memory][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][linux][rec][memory][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][linux][rec][memory][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][linux][rec][memory][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][linux][rec][memory][units]"
+
+[fields."id:app_content_sysreqs_linux_rec_graphics__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_rec_graphics__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_rec_graphics__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][linux][rec][diskspace][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][linux][rec][diskspace][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][linux][rec][diskspace][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][linux][rec][diskspace][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][linux][rec][diskspace][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][linux][rec][diskspace][units]"
+
+[fields."id:app_content_sysreqs_linux_rec_soundcard__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_rec_soundcard__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_rec_soundcard__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_linux_rec_vrsupport__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_rec_vrsupport__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_rec_vrsupport__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_linux_rec_notes__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_linux_rec_notes__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_linux_rec_notes__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_android_min_osversion__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_android_min_osversion__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_android_min_osversion__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][android][min][diskspace][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][android][min][diskspace][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][android][min][diskspace][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][android][min][diskspace][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][android][min][diskspace][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][android][min][diskspace][units]"
+
+[fields."id:app_content_sysreqs_android_min_vrsupport__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_android_min_vrsupport__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_android_min_vrsupport__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_android_min_notes__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_android_min_notes__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_android_min_notes__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_android_rec_osversion__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_android_rec_osversion__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_android_rec_osversion__textarea"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][android][rec][diskspace][amount]"]
+tab = "basic"
+selector = "input[name=\"app[content][sysreqs][android][rec][diskspace][amount]\"]"
+tag = "input"
+expected_name = "app[content][sysreqs][android][rec][diskspace][amount]"
+input_type = "text"
+
+[fields."name:app[content][sysreqs][android][rec][diskspace][units]"]
+tab = "basic"
+selector = "select[name=\"app[content][sysreqs][android][rec][diskspace][units]\"]"
+tag = "select"
+expected_name = "app[content][sysreqs][android][rec][diskspace][units]"
+
+[fields."id:app_content_sysreqs_android_rec_vrsupport__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_android_rec_vrsupport__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_android_rec_vrsupport__textarea"
+input_type = "text"
+
+[fields."id:app_content_sysreqs_android_rec_notes__textarea"]
+tab = "basic"
+selector = "input[id=\"app_content_sysreqs_android_rec_notes__textarea\"]"
+tag = "input"
+expected_id = "app_content_sysreqs_android_rec_notes__textarea"
+input_type = "text"
+
+[fields."id:controllersupport_input_8"]
+tab = "basic"
+selector = "input[id=\"controllersupport_input_8\"]"
+tag = "input"
+expected_id = "controllersupport_input_8"
+expected_name = "app[content][keyboardmouse][notice]"
+input_type = "text"
+
+[fields."id:controllersupport_input_10"]
+tab = "basic"
+selector = "input[id=\"controllersupport_input_10\"]"
+tag = "input"
+expected_id = "controllersupport_input_10"
+expected_name = "app[content][controllertagwizard][v1]"
+input_type = "text"
+
+[fields."name:app[content][accessibilitywizard][v1]"]
+tab = "basic"
+selector = "input[name=\"app[content][accessibilitywizard][v1]\"]"
+tag = "input"
+expected_name = "app[content][accessibilitywizard][v1]"
+input_type = "text"
+
+[fields."name:app[content][accessibilitywizard][v2]"]
+tab = "basic"
+selector = "input[name=\"app[content][accessibilitywizard][v2]\"]"
+tag = "input"
+expected_name = "app[content][accessibilitywizard][v2]"
+input_type = "text"
+
+[fields."id:app_game_3pdrm_provider_"]
+tab = "basic"
+selector = "input[id=\"app_game_3pdrm_provider_\"]"
+tag = "input"
+expected_id = "app_game_3pdrm_provider_"
+expected_name = "app[game][3pdrm][provider]"
+input_type = "text"
+
+[fields."id:app_game_3pdrm_activation_limit_"]
+tab = "basic"
+selector = "input[id=\"app_game_3pdrm_activation_limit_\"]"
+tag = "input"
+expected_id = "app_game_3pdrm_activation_limit_"
+expected_name = "app[game][3pdrm][activation_limit]"
+input_type = "text"
+
+[fields."id:app_game_3pacc_provider_"]
+tab = "basic"
+selector = "input[id=\"app_game_3pacc_provider_\"]"
+tag = "input"
+expected_id = "app_game_3pacc_provider_"
+expected_name = "app[game][3pacc][provider]"
+input_type = "text"
+
+[fields."id:app_content_legal__select"]
+tab = "basic"
+selector = "select[id=\"app_content_legal__select\"]"
+tag = "select"
+expected_id = "app_content_legal__select"
+
+[fields."id:app_content_legal__textarea"]
+tab = "basic"
+selector = "textarea[id=\"app_content_legal__textarea\"]"
+tag = "textarea"
+expected_id = "app_content_legal__textarea"
+
+[fields."id:app[content][support_info][url]"]
+tab = "basic"
+selector = "input[id=\"app[content][support_info][url]\"]"
+tag = "input"
+expected_id = "app[content][support_info][url]"
+expected_name = "app[content][support_info][url]"
+input_type = "text"
+
+[fields."id:app[content][support_info][email]"]
+tab = "basic"
+selector = "input[id=\"app[content][support_info][email]\"]"
+tag = "input"
+expected_id = "app[content][support_info][email]"
+expected_name = "app[content][support_info][email]"
+input_type = "text"
+
+[fields."id:app[content][support_info][phone]"]
+tab = "basic"
+selector = "input[id=\"app[content][support_info][phone]\"]"
+tag = "input"
+expected_id = "app[content][support_info][phone]"
+expected_name = "app[content][support_info][phone]"
+input_type = "text"
+
+[fields."name:app[content][reviews][0][site]"]
+tab = "description"
+selector = "input[name=\"app[content][reviews][0][site]\"]"
+tag = "input"
+expected_name = "app[content][reviews][0][site]"
+input_type = "text"
+
+[fields."name:app[content][reviews][0][url]"]
+tab = "description"
+selector = "input[name=\"app[content][reviews][0][url]\"]"
+tag = "input"
+expected_name = "app[content][reviews][0][url]"
+input_type = "text"
+
+[fields."name:app[content][reviews][0][score]"]
+tab = "description"
+selector = "input[name=\"app[content][reviews][0][score]\"]"
+tag = "input"
+expected_name = "app[content][reviews][0][score]"
+input_type = "text"
+
+[fields."id:app_content_reviews_0_quote__textarea"]
+tab = "description"
+selector = "input[id=\"app_content_reviews_0_quote__textarea\"]"
+tag = "input"
+expected_id = "app_content_reviews_0_quote__textarea"
+input_type = "text"
+
+[fields."id:app_content_reviews_0_quote__select"]
+tab = "description"
+selector = "select[id=\"app_content_reviews_0_quote__select\"]"
+tag = "select"
+expected_id = "app_content_reviews_0_quote__select"
+
+[fields."name:app[content][reviews][1][site]"]
+tab = "description"
+selector = "input[name=\"app[content][reviews][1][site]\"]"
+tag = "input"
+expected_name = "app[content][reviews][1][site]"
+input_type = "text"
+
+[fields."name:app[content][reviews][1][url]"]
+tab = "description"
+selector = "input[name=\"app[content][reviews][1][url]\"]"
+tag = "input"
+expected_name = "app[content][reviews][1][url]"
+input_type = "text"
+
+[fields."name:app[content][reviews][1][score]"]
+tab = "description"
+selector = "input[name=\"app[content][reviews][1][score]\"]"
+tag = "input"
+expected_name = "app[content][reviews][1][score]"
+input_type = "text"
+
+[fields."id:app_content_reviews_1_quote__textarea"]
+tab = "description"
+selector = "input[id=\"app_content_reviews_1_quote__textarea\"]"
+tag = "input"
+expected_id = "app_content_reviews_1_quote__textarea"
+input_type = "text"
+
+[fields."id:app_content_reviews_1_quote__select"]
+tab = "description"
+selector = "select[id=\"app_content_reviews_1_quote__select\"]"
+tag = "select"
+expected_id = "app_content_reviews_1_quote__select"
+
+[fields."name:app[content][reviews][2][site]"]
+tab = "description"
+selector = "input[name=\"app[content][reviews][2][site]\"]"
+tag = "input"
+expected_name = "app[content][reviews][2][site]"
+input_type = "text"
+
+[fields."name:app[content][reviews][2][url]"]
+tab = "description"
+selector = "input[name=\"app[content][reviews][2][url]\"]"
+tag = "input"
+expected_name = "app[content][reviews][2][url]"
+input_type = "text"
+
+[fields."name:app[content][reviews][2][score]"]
+tab = "description"
+selector = "input[name=\"app[content][reviews][2][score]\"]"
+tag = "input"
+expected_name = "app[content][reviews][2][score]"
+input_type = "text"
+
+[fields."id:app_content_reviews_2_quote__textarea"]
+tab = "description"
+selector = "input[id=\"app_content_reviews_2_quote__textarea\"]"
+tag = "input"
+expected_id = "app_content_reviews_2_quote__textarea"
+input_type = "text"
+
+[fields."id:app_content_reviews_2_quote__select"]
+tab = "description"
+selector = "select[id=\"app_content_reviews_2_quote__select\"]"
+tag = "select"
+expected_id = "app_content_reviews_2_quote__select"
+
+[fields."id:app_content_sections_0_label__textarea"]
+tab = "description"
+selector = "input[id=\"app_content_sections_0_label__textarea\"]"
+tag = "input"
+expected_id = "app_content_sections_0_label__textarea"
+input_type = "text"
+
+[fields."id:app_content_sections_0_label__select"]
+tab = "description"
+selector = "select[id=\"app_content_sections_0_label__select\"]"
+tag = "select"
+expected_id = "app_content_sections_0_label__select"
+
+[fields."name:app[content][sections][0][allowed_countries]"]
+tab = "description"
+selector = "input[name=\"app[content][sections][0][allowed_countries]\"]"
+tag = "input"
+expected_name = "app[content][sections][0][allowed_countries]"
+input_type = "text"
+
+[fields."name:app[content][sections][0][restricted_countries]"]
+tab = "description"
+selector = "input[name=\"app[content][sections][0][restricted_countries]\"]"
+tag = "input"
+expected_name = "app[content][sections][0][restricted_countries]"
+input_type = "text"
+
+[fields."id:app_content_earlyaccess_why__select"]
+tab = "earlyaccess"
+selector = "select[id=\"app_content_earlyaccess_why__select\"]"
+tag = "select"
+expected_id = "app_content_earlyaccess_why__select"
+
+[fields."id:app_content_earlyaccess_why__textarea"]
+tab = "earlyaccess"
+selector = "textarea[id=\"app_content_earlyaccess_why__textarea\"]"
+tag = "textarea"
+expected_id = "app_content_earlyaccess_why__textarea"
+
+[fields."id:app_content_earlyaccess_how_long__select"]
+tab = "earlyaccess"
+selector = "select[id=\"app_content_earlyaccess_how_long__select\"]"
+tag = "select"
+expected_id = "app_content_earlyaccess_how_long__select"
+
+[fields."id:app_content_earlyaccess_how_long__textarea"]
+tab = "earlyaccess"
+selector = "textarea[id=\"app_content_earlyaccess_how_long__textarea\"]"
+tag = "textarea"
+expected_id = "app_content_earlyaccess_how_long__textarea"
+
+[fields."id:app_content_earlyaccess_full_version__select"]
+tab = "earlyaccess"
+selector = "select[id=\"app_content_earlyaccess_full_version__select\"]"
+tag = "select"
+expected_id = "app_content_earlyaccess_full_version__select"
+
+[fields."id:app_content_earlyaccess_full_version__textarea"]
+tab = "earlyaccess"
+selector = "textarea[id=\"app_content_earlyaccess_full_version__textarea\"]"
+tag = "textarea"
+expected_id = "app_content_earlyaccess_full_version__textarea"
+
+[fields."id:app_content_earlyaccess_current_state__select"]
+tab = "earlyaccess"
+selector = "select[id=\"app_content_earlyaccess_current_state__select\"]"
+tag = "select"
+expected_id = "app_content_earlyaccess_current_state__select"
+
+[fields."id:app_content_earlyaccess_current_state__textarea"]
+tab = "earlyaccess"
+selector = "textarea[id=\"app_content_earlyaccess_current_state__textarea\"]"
+tag = "textarea"
+expected_id = "app_content_earlyaccess_current_state__textarea"
+
+[fields."id:app_content_earlyaccess_pricing__select"]
+tab = "earlyaccess"
+selector = "select[id=\"app_content_earlyaccess_pricing__select\"]"
+tag = "select"
+expected_id = "app_content_earlyaccess_pricing__select"
+
+[fields."id:app_content_earlyaccess_pricing__textarea"]
+tab = "earlyaccess"
+selector = "textarea[id=\"app_content_earlyaccess_pricing__textarea\"]"
+tag = "textarea"
+expected_id = "app_content_earlyaccess_pricing__textarea"
+
+[fields."id:app_content_earlyaccess_community__select"]
+tab = "earlyaccess"
+selector = "select[id=\"app_content_earlyaccess_community__select\"]"
+tag = "select"
+expected_id = "app_content_earlyaccess_community__select"
+
+[fields."id:app_content_earlyaccess_community__textarea"]
+tab = "earlyaccess"
+selector = "textarea[id=\"app_content_earlyaccess_community__textarea\"]"
+tag = "textarea"
+expected_id = "app_content_earlyaccess_community__textarea"

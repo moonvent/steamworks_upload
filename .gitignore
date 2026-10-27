@@ -1,0 +1,9 @@
+/target/
+# Legacy private locations: retained as protection against accidental imports.
+/store.toml
+/store-data/
+/browser-profile/
+/.tools/
+/runtime/
+*.log
+.env
