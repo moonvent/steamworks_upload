@@ -1,5 +1,9 @@
 # Working on Steamproject Update
 
+Use English exclusively in repository files, code, comments, documentation, commit
+messages, and GitHub content. Keep account-specific localized store text in private
+storage outside the repository.
+
 For session handoff, read `PROJECT_MEMORY.md` first. It points to the private
 continuation note outside this repository; keep account-specific context there.
 

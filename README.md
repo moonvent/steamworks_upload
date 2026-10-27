@@ -4,74 +4,73 @@ Rust CLI for auditing and editing Steamworks store drafts through your own brows
 session. Includes an interactive terminal and a JSON-lines interface for coding
 agents. No Steam password or partner API key is needed by the program.
 
-## Как открыть и запустить проект (Linux x86_64)
+## Open and run the project (Linux x86_64)
 
-Установите Git, Rust/Cargo (stable), Chrome или Chromium, Bash, curl, unzip и
-Python 3. Нужен аккаунт Steamworks с доступом к приложению, которое вы редактируете.
+Install Git, Rust/Cargo (stable), Chrome or Chromium, Bash, curl, unzip and
+Python 3. You need a Steamworks account with access to the app you want to edit.
 
-Склонируйте репозиторий и перейдите в папку проекта:
+Clone the repository and enter its directory:
 
 ```bash
 git clone git@github.com:moonvent/steamworks_upload.git
 cd steamworks_upload
 ```
 
-Для SSH-клонирования ваш SSH-ключ должен быть добавлен в GitHub. Можно использовать
-HTTPS: `git clone https://github.com/moonvent/steamworks_upload.git`.
+SSH cloning requires an SSH key registered with GitHub. Alternatively, use HTTPS:
+`git clone https://github.com/moonvent/steamworks_upload.git`.
 
-Откройте эту папку в редакторе или продолжайте в терминале. Установите подходящий
-ChromeDriver и запустите утилиту, заменив `YOUR_APP_ID` числовым AppID своей игры:
+Open this directory in your editor or continue in the terminal. Install a matching
+ChromeDriver and start the utility, replacing `YOUR_APP_ID` with your numeric AppID:
 
 ```bash
 ./tools/install_driver.sh
 ./run.sh --app YOUR_APP_ID
 ```
 
-При первом запуске Cargo соберёт программу, а утилита создаст приватный конфиг игры.
-AppID можно найти в списке своих приложений на Steamworks. Реальный AppID не нужно
-вписывать в исходники или файлы примеров.
+On the first run, Cargo builds the program and the utility creates a private app
+configuration. Find your AppID in your Steamworks app list. Keep real AppIDs out
+of source files and examples.
 
-### Как войти в Steamworks и открыть страницу приложения
+### Sign in to Steamworks and open the app page
 
-1. В открывшемся Chrome войдите в свой аккаунт Steamworks и подтвердите Steam Guard.
-   Вводите пароль и код непосредственно в браузере.
-2. Утилита открывает панель приложения по адресу
+1. Sign in to Steamworks in the Chrome window and complete Steam Guard. Enter your
+   password and verification code directly in the browser.
+2. The utility opens the app dashboard at
    `https://partner.steamgames.com/apps/landing/YOUR_APP_ID`.
-3. Если после входа редактор не открылся автоматически, на панели игры нажмите
-   **Edit Store Page**. Прямой адрес редактора:
+3. If the editor does not open automatically after sign-in, click **Edit Store Page**
+   on the app dashboard. The direct editor address is
    `https://partner.steamgames.com/admin/game/edit/YOUR_APP_ID`.
-4. В терминале утилиты выполните `audit`: он проверит вкладки страницы магазина и
-   покажет пропуски. `fields basic` покажет доступные поля вкладки Basic Info.
+4. Run `audit` in the utility terminal to check store editor tabs and report gaps.
+   Run `fields basic` to list available fields on the Basic Info tab.
 
-Это редактор страницы магазина в Steamworks. Для доступа к нему нужны права на
-соответствующее приложение. Утилита использует отдельный профиль Chrome и сохраняет
-вход в приватном каталоге, поэтому при следующих запусках повторный вход может
-не понадобиться. Завершить сессию утилиты можно командой `quit`.
+The Steamworks store editor requires permission to access the selected app. The
+utility uses a dedicated Chrome profile and keeps the session in private storage,
+so you may remain signed in on later runs. Use `quit` to close the utility session.
 
-### Как продолжить работу и скачать локализацию
+### Resume work and download localization
 
 ```bash
 cd steamworks_upload
 ./run.sh --app YOUR_APP_ID
 ```
 
-В терминале запущенной утилиты:
+In the running utility terminal:
 
 ```text
 audit
 export-localization
 ```
 
-Экспорт скачивает JSON из **Localization → JSON → All Languages** и сообщает путь
-к файлу. Переводимые тексты и копии для редактирования храните в приватном каталоге,
-вне репозитория. Пустые поля могут отсутствовать в экспорте; после подготовки
-основных текстов выгрузите файл повторно. Импорт локализации пока не автоматизирован.
+The export downloads JSON from **Localization → JSON → All Languages** and reports
+the file path. Keep translations and working copies in private storage outside the
+repository. Empty fields may be absent from the export; export again after preparing
+the source text. Localization import is not yet automated.
 
-Команда `save` сохраняет черновик магазина. Публикация выполняется отдельно вручную
-в Steamworks; автоматической публикации в утилите нет.
+The `save` command saves a store draft. Publishing is a separate manual step in
+Steamworks; the utility does not publish automatically.
 
-На других платформах можно собрать Rust-бинарник и вручную установить совместимый
-ChromeDriver; поставляемые скрипты установки и запуска рассчитаны на Linux.
+Other platforms can build the Rust binary and use a manually installed matching
+ChromeDriver; the supplied shell installer and launcher target Linux.
 
 ## Verified page templates and recordings
 

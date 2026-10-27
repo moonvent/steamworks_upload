@@ -476,10 +476,10 @@ mod tests {
     #[test]
     fn preserves_unicode_json_values() {
         let r = parse_request(
-            r#"{"command":"set","tab":"basic","field":"name:app[name]","value":"Игра 🛡️"}"#,
+            r#"{"command":"set","tab":"basic","field":"name:app[name]","value":"Game 🛡️"}"#,
             true,
         )
         .unwrap();
-        assert!(matches!(r,Request::Set{value,..}if value=="Игра 🛡️"));
+        assert!(matches!(r,Request::Set{value,..}if value=="Game 🛡️"));
     }
 }

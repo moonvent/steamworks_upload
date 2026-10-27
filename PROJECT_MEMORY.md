@@ -1,118 +1,115 @@
-# Память проекта: Steamproject Update
+# Project memory: Steamproject Update
 
-Обновлено: 2026-10-27. Это запись для продолжения работы после открытия данного
-проекта как отдельной рабочей директории. Сначала прочитать `AGENTS.md` и этот файл.
+Updated: 2026-10-27. Read `AGENTS.md` and this file when resuming the project.
+Use English exclusively in repository files, source code, comments, documentation,
+commit messages, and GitHub content. Account-specific translations belong in
+private storage outside the repository.
 
-## Задача пользователя
+## Objective and agreed constraints
 
-Сделать распространяемую утилиту на Rust для управления страницами игр Steamworks
-через браузер. Ассистент должен по запросу обходить вкладки, сообщать, что не
-заполнено, и помогать заполнять конкретные сведения об игре. Не привязывать
-публикуемый код к аккаунту, одной игре или текущей машине.
+Build a distributable Rust utility for auditing and editing Steamworks store pages
+through a browser. An assistant should inspect tabs, report missing information,
+and fill specific user-approved game details. Keep the project independent of any
+partner account, game, or workstation.
 
-Пользователь согласовал:
+- Use explicit TOML recipes for pages, tabs, selectors, types, names/IDs, uniqueness,
+  language selection, and save verification.
+- Validate recipes before reading or editing. On genuine schema drift, stop and
+  propose a correction instead of guessing another selector.
+- Use visible Chrome, a journal, and before/after/error screenshots.
+- Optional native Chrome video starts after sign-in; never capture login or Steam
+  Guard pages. Audio is disabled.
+- Keep account data, game text, profiles, reports, recordings, and backups outside
+  the source tree. Never publish a store page automatically.
 
-- Явные шаблоны страниц/полей в TOML: адрес, вкладка, селектор, тип, имя/ID,
-  уникальность элемента, переключение языка и проверка сохранения.
-- Проверять шаблоны перед чтением/изменением. При реальном изменении структуры
-  остановиться, показать проблему и согласовать исправление; не угадывать селектор.
-- Видимый Chrome, журнал и скриншоты до/после операции и при ошибке.
-- Видео средствами Chrome, если доступны, отдельной опцией; запись после входа,
-  без экранов пароля/Steam Guard. Звук выключен.
-- Все личные данные, тексты конкретных игр, профиль входа, отчёты, записи и бэкапы
-  хранить вне исходников. Никакой автоматической публикации магазина.
+## Current state
 
-## Текущее состояние
+Rust CLI version 0.3.0, with interactive and JSON Lines interfaces; no GUI.
+MIT licensed, with an explicit Cargo package allowlist.
 
-Rust CLI версии 0.3.0. Это терминальная утилита, GUI-приложение пока не создавалось.
-Есть интерактивный режим и JSON Lines для управления ассистентом. Проект подготовлен
-к распространению как исходники, с MIT LICENSE и явным allowlist Cargo-пакета.
-По запросу пользователя проект загружен на GitHub:
-`https://github.com/moonvent/steamworks_upload`, ветка `main`.
-На crates.io проект не публиковался.
+GitHub: `https://github.com/moonvent/steamworks_upload`, branch `main`.
+Remote `origin`: `git@github.com:moonvent/steamworks_upload.git`.
+The initial GitHub MIT-license commit was merged into local history without
+rewriting it. Historical files were checked for private data before pushing.
+The project has not been published to crates.io.
 
-По запросу пользователя создан локальный Git-репозиторий, ветка `main`.
-Удалённый `origin`: `git@github.com:moonvent/steamworks_upload.git`.
-Начальная история GitHub с MIT-лицензией объединена с локальной историей без
-перезаписи. Перед отправкой проверены исторические файлы на приватные данные.
-README содержит русские инструкции клонирования, запуска, входа в Steamworks,
-перехода в редактор приложения и экспорта локализации.
+Implemented:
 
-Работает:
+- ChromeDriver/Chrome launch with a dedicated persistent browser profile.
+- Audits of all nine store editor tabs using Steamworks required-status markers,
+  asset counters, and empty-field reports. Optional empty fields are not blockers.
+- Read, pull, compare, and fill the base title and descriptions for a selected
+  language. Full descriptions use Steam BBCode and the native React plain editor.
+- Generic reviewed text, textarea, select, checkbox, and radio controls.
+- Draft Save through the native button, followed by reload and readback.
+- Private backups, screenshots, JSONL journals, and an HTML operation timeline.
+- `export-localization`: native Localization → JSON → All Languages download into
+  `apps/<app-id>/localization/<timestamp>/`, with control and JSON validation.
+  Verified by a live download without Save. Localization import is not automated.
+- Native MP4 via CDP `Page.startScreenRecording`/`stopScreenRecording` and IO stream.
+  Unsupported Chrome versions are reported; screenshots remain enabled.
+- `templates/store.toml`: page identity, nine tabs, main text fields, 120 additional
+  structural recipes, and localization download controls.
 
-- Запуск ChromeDriver и Chrome, отдельный профиль с сохранением входа.
-- Аудит всех девяти вкладок редактора страницы магазина.
-- Отчёт по штатным `.required_status`/`.required_set`, счётчикам изображений и
-  пустым полям. Не считать всякое пустое необязательное поле блокером релиза.
-- Чтение/скачивание, сравнение, заполнение базового названия и описаний выбранного
-  языка. Полное описание — Steam BBCode; для React используется штатный plain editor.
-- Общие операции с проверенными обычными контролами (text/textarea/select и
-  checkbox/radio при наличии соответствующего шаблона).
-- Черновик сохраняется через штатную кнопку Save, затем страница перечитывается.
-- Приватные бэкапы, снимки, JSONL-журнал и HTML-лента операции.
-- `export-localization`: штатный JSON-экспорт Localization → All Languages,
-  проверка контролов и структуры скачанного файла, отдельный приватный каталог
-  `apps/<app-id>/localization/<timestamp>/`. Проверен живым скачиванием без Save.
-- Нативный MP4 через CDP `Page.startScreenRecording`/`stopScreenRecording` и IO stream.
-  Работоспособность проверена на установленном Chrome. При отсутствии поддержки
-  видео явно сообщается; скриншоты остаются.
-- В `templates/store.toml`: шаблон страницы, девять вкладок, основные текстовые поля
-  и 120 дополнительных структурных рецептов (контакты, ссылки, sysreqs и др.).
+Steamworks ignores tab clicks while XFade runs. `browser.rs` waits for effects to
+finish before clicking and for the visible active tab afterward. This is a UI
+transition delay rather than schema drift.
 
-Во время разработки найдено: Steamworks игнорирует клик по вкладке, пока не закончена
-анимация XFade. В `browser.rs` есть ожидание окончания эффектов перед кликом и
-ожидание активной видимой вкладки после него. Это задержка UI, не дрейф шаблона.
+## Code map
 
-## Где код
+- `src/main.rs`: CLI, JSON protocol, pending changes.
+- `src/templates.rs`, `templates/store.toml`: recipe loading and validation.
+- `src/browser.rs`: tabs, audits, fields, Save, explicit file selection, exports.
+- `src/audit.js`: tab state extraction excluding passwords and hidden fields.
+- `src/store.rs`: app config, descriptions, languages, snapshots, backups, fill/save.
+- `src/recording.rs`: screenshots, events, HTML timeline, native video.
+- `src/paths.rs`: private directories.
+- `run.sh`: driver on an available localhost port and CLI startup.
+- `tools/install_driver.sh`: matching official ChromeDriver installer, Linux x86_64.
+- `README.md`: setup, sign-in, app editor access, workflow, and limitations.
 
-- `src/main.rs`: CLI, JSON-протокол, состояние ожидающих сохранения изменений.
-- `src/templates.rs`, `templates/store.toml`: загрузка/валидация шаблонов.
-- `src/browser.rs`: вкладки, аудит, общие поля, Save, явный выбор файла для upload.
-- `src/audit.js`: извлечение состояния вкладки без паролей/скрытых служебных полей.
-- `src/store.rs`: конфиг игры, описания, языки, snapshots, backup, fill/save.
-- `src/recording.rs`: снимки, события, HTML, штатная запись видео.
-- `src/paths.rs`: приватные каталоги.
-- `run.sh`: запуск драйвера на свободном localhost-порту и CLI.
-- `tools/install_driver.sh`: официальный ChromeDriver под установленный Chrome
-  (пока Linux x86_64).
-- `README.md`: инструкция использования и ограничения.
+Templates reload before operations. Checkout files take precedence during
+development; installed binaries carry an embedded fallback. Set
+`STEAMPROJECT_TEMPLATES` for an explicit alternative reviewed TOML file.
 
-Шаблоны перечитываются перед операциями. При разработке используются файлы checkout,
-для установленного бинарника есть встроенная копия. `STEAMPROJECT_TEMPLATES` задаёт
-явный путь к альтернативному, заранее проверенному TOML.
+## Private state and session handoff
 
-## Приватное состояние и конкретная игра
+Run `./run.sh paths` to locate private storage. The Linux default is
+`${XDG_DATA_HOME:-$HOME/.local/share}/steamproject-update`.
+`STEAMPROJECT_HOME` overrides the entire root.
 
-Узнать расположение: `./run.sh paths`.
-По умолчанию Linux: `${XDG_DATA_HOME:-$HOME/.local/share}/steamproject-update`.
-Полное переопределение: `STEAMPROJECT_HOME`.
+Read `CONTINUATION_PRIVATE.md` under that root for the active game, latest audit,
+localization exports, and recording locations. Never copy its contents into the
+repository. Private storage contains:
 
-В приватном корне находится `CONTINUATION_PRIVATE.md`: там контекст текущей игры,
-результат последнего аудита и пути к записи. Прочитать его для продолжения работы
-с пользователем; не копировать его содержимое в публикуемые исходники.
-`active-app` хранит последний AppID, `apps/<app-id>/store.toml` — конфиг игры.
-`browser-profile/` — действующая сессия входа; не читать и не выводить cookies.
-`runtime/` — отчёты, бэкапы, записи. `tools/` — скачанный ChromeDriver.
+- `active-app`: last selected AppID.
+- `apps/<app-id>/store.toml`: game configuration and description file paths.
+- `apps/<app-id>/localization/`: exports and translation working copies.
+- `browser-profile/`: authenticated browser session; never read or print cookies.
+- `runtime/`: reports, backups, screenshots, journals, and videos.
+- `tools/`: downloaded ChromeDriver.
 
-Личные файлы ранее лежали в checkout, но перенесены за его пределы. Старые пути
-дополнительно защищены `.gitignore`; пакет Cargo включает только явный список
-исходников, шаблонов, примеров и документации.
+Legacy private paths inside the checkout are protected by `.gitignore`. The Cargo
+package includes only explicitly listed source, templates, examples, and docs.
 
-## Продолжение работы
+## Resuming work
 
-1. Прочитать приватную заметку и определить активное приложение.
-2. Запустить `./run.sh --app APP_ID --json --video` (реальный ID брать из приватного
-   конфига). Пользователь входит вручную при необходимости.
-3. В stdin отправлять по одному JSON-запросу. Stdout — JSON, диагностика — stderr.
-   В начале есть событие ready. Существующий браузер может ещё быть открыт: не
-   удалять Chrome lock-файлы и не завершать все процессы Chrome без разбора.
-4. Начать с свежего `audit`: прошлый отчёт — снимок состояния, а не вечная истина.
-5. Обсудить необходимые реальные сведения/ресурсы с пользователем, затем менять
-   ровно то, что он запросил. Не придумывать контакты, требования, языки, функции.
-6. Сохранение конкретных изменений в Steam не было выполнено в ходе последнего
-   аудита; пользователь просил реализовать механизм и сообщить о пропусках.
+1. Read the private continuation note and identify the active app.
+2. Start `./run.sh --app APP_ID --json --video` using the private configuration.
+   The user signs in manually if required.
+3. Send one JSON request per stdin line. Stdout contains JSON and an initial
+   `ready` event; diagnostics go to stderr. Use a persistent stdin/TTY session.
+4. Start with a fresh `audit`; previous reports are snapshots.
+5. Agree on concrete real text/assets before making the requested changes. Never
+   invent contacts, requirements, languages, features, or gameplay facts.
+6. Distinguish draft Save from publication. Live saves/uploads require approval for
+   those specific content changes; do not perform them merely to test code.
 
-Примеры запросов (без настоящих данных):
+A previous browser may still hold the profile. Do not delete live Chrome lock
+files or terminate unrelated Chrome processes. Old session IDs and ports are not
+stable; start a new utility session rather than guessing them.
+
+Example requests with placeholder data:
 
 ```json
 {"command":"audit"}
@@ -129,41 +126,40 @@ README содержит русские инструкции клонирован
 {"command":"quit"}
 ```
 
-`pull` записывает текущие тексты в приватный конфиг и BBCode-файл с бэкапом старого
-конфига. После изменения файлов: plan → fill → save. `fill` не сохраняет.
-Патчи описаний и общие патчи полей нельзя смешивать до save/discard.
-Операция `save` не публикует изменения магазина.
+`pull` backs up and updates the private config and BBCode file. After editing local
+text: plan → fill → save. `fill` does not save. Description patches and generic
+field patches cannot be mixed before save/discard. Export also requires no pending
+changes. Save never publishes the store page.
 
-## Границы и следующие улучшения
+## Limitations and next improvements
 
-- Произвольные React-мастера (например, Controller Support), локализованные названия
-  игры, сложные upload-виджеты требуют отдельных адаптеров. Не заявлять, что уже
-  реализовано управление каждым элементом Steamworks.
-- Часть полей обнаруживается аудитом, но не имеет reviewed recipe. Общая запись
-  таких полей блокируется. `fields` сообщает `template_reviewed`.
-- Выбор файла не доказывает успешную загрузку: некоторые виджеты отправляют его
-  сразу. Нужны отдельные подтверждения результата/категории ресурса.
-- Аудит охватывает редактор магазина; технические настройки, цены, билды и все
-  условия допуска к релизу им полностью не проверяются.
-- Снимки/видео показывают viewport вкладки. Не записываются другие окна рабочего
-  стола и звук. Видео экспериментальное и зависит от версии Chrome.
-- Linux launcher готов; прочие ОС требуют ручного подходящего драйвера/запуска CLI.
-- Для полноценной приёмки записи нужно конкретное разрешённое изменение содержимого
-  и live-проверка Save. Чтение, ввод с восстановлением и аудит уже проверялись.
+- Complex React wizards, Controller Support, localized game titles, and complex
+  upload widgets need dedicated adapters. Do not claim all controls are supported.
+- Audits may discover fields without reviewed recipes; generic writes are blocked.
+  `fields` reports `template_reviewed`.
+- Selecting a file is not proof of successful upload. Some widgets send it
+  immediately; asset-specific confirmation is required.
+- Audits cover the store editor, not all technical settings, prices, builds, or
+  release eligibility requirements.
+- Screenshots/video show the page viewport, without other desktop windows or
+  sound. Native video is experimental and depends on Chrome support.
+- Other operating systems require manual driver installation and binary setup.
+- Full live Save acceptance needs a specifically authorized content change.
+  Reading, temporary input with restoration, and auditing have been checked.
 
-## Последние проверки
+## Validation history
 
-На момент записи прошли:
-
-- `cargo test`: 6 тестов (JSON-запросы, Unicode, ограничения описания, несовпадение
-  AppID, версия/домен шаблона).
+- `cargo test`: six tests covering request validation, Unicode, description length,
+  AppID mismatch, template version, and origin validation.
 - `cargo clippy -- -D warnings`.
-- `./run.sh --headless --video --profile /tmp/steamproject-browser-smoke`: фильтрация
-  секретных полей; отказ при изменении типа и неоднозначном поле; нативный MP4.
-- Живой аудит девяти вкладок без ошибок, чтение описаний и контакта через шаблоны.
-- `cargo package --list --allow-dirty` и `cargo package --no-verify --allow-dirty`:
-  пакет 18 файлов; проверено отсутствие личных каталогов и идентификаторов игры.
-  Артефакт: `target/package/steamproject_update-0.3.0.crate`.
+- `./run.sh --headless --video --profile /tmp/steamproject-browser-smoke`: secret
+  filtering, rejection of changed types and ambiguous controls, native MP4.
+- Live nine-tab audit and template-based description/contact reading.
+- Live all-language localization JSON export without Save or publication.
+- `cargo package --list --allow-dirty` and
+  `cargo package --no-verify --allow-dirty`: checked for private directories and
+  account-specific identifiers. Archive:
+  `target/package/steamproject_update-0.3.0.crate`.
 
-Это документальное обновление памяти не требует повторного запуска браузерных
-проверок. При изменениях кода следовать проверкам из AGENTS.md.
+Documentation-only handoff updates do not require another browser test. Follow
+`AGENTS.md` validation requirements when changing code.
