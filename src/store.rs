@@ -19,13 +19,25 @@ pub struct Store {
     pub description_file: PathBuf,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Serialize, Eq)]
 pub struct Snapshot {
     pub app_id: u32,
     pub language: String,
     pub name: String,
     pub short_description: String,
     pub description: String,
+}
+
+impl PartialEq for Snapshot {
+    fn eq(&self, other: &Self) -> bool {
+        // Steam normalizes BBCode line endings on Save. Preserve the original
+        // bytes in snapshots and backups, but accept that transport-only change.
+        self.app_id == other.app_id
+            && self.language == other.language
+            && self.name == other.name
+            && self.short_description == other.short_description
+            && self.description.replace("\r\n", "\n") == other.description.replace("\r\n", "\n")
+    }
 }
 
 pub fn load(path: &Path) -> Result<Store> {
@@ -302,6 +314,52 @@ pub async fn roundtrip(driver: &WebDriver, config: &Store) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn accepts_saved_crlf_without_hiding_content_changes() {
+        let original = Snapshot {
+            app_id: 1,
+            language: "english".into(),
+            name: "Example".into(),
+            short_description: "Example description".into(),
+            description: "[h2]Title[/h2]\n\n[p]Text[/p]\n".into(),
+        };
+        let mut saved = original.clone();
+        saved.description = saved.description.replace('\n', "\r\n");
+        assert_eq!(original, saved);
+        assert!(saved.description.contains("\r\n"));
+        for changed in [
+            Snapshot {
+                app_id: 2,
+                ..saved.clone()
+            },
+            Snapshot {
+                language: "french".into(),
+                ..saved.clone()
+            },
+            Snapshot {
+                name: "Changed".into(),
+                ..saved.clone()
+            },
+            Snapshot {
+                short_description: "Changed".into(),
+                ..saved.clone()
+            },
+            Snapshot {
+                description: saved.description.replace("Text", "Changed"),
+                ..saved.clone()
+            },
+            Snapshot {
+                description: saved.description.replace("\r\n\r\n", "\r\n"),
+                ..saved.clone()
+            },
+            Snapshot {
+                description: saved.description.trim_end().into(),
+                ..saved.clone()
+            },
+        ] {
+            assert_ne!(original, changed);
+        }
+    }
     #[test]
     fn refuses_cross_app_plan() {
         let a = Snapshot {

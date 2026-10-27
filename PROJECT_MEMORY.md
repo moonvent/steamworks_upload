@@ -42,6 +42,8 @@ Implemented:
   language. Full descriptions use Steam BBCode and the native React plain editor.
 - Generic reviewed text, textarea, select, checkbox, and radio controls.
 - Draft Save through the native button, followed by reload and readback.
+  Authorized text, support-contact, and system-requirement drafts have been saved
+  and verified. No store publication was performed.
 - Private backups, screenshots, JSONL journals, and an HTML operation timeline.
 - `export-localization`: native Localization → JSON → All Languages download into
   `apps/<app-id>/localization/<timestamp>/`, with control and JSON validation.
@@ -145,12 +147,20 @@ changes. Save never publishes the store page.
   sound. Native video is experimental and depends on Chrome support.
 - Other operating systems require manual driver installation and binary setup.
 - Full live Save acceptance needs a specifically authorized content change.
-  Reading, temporary input with restoration, and auditing have been checked.
+  Reading, temporary input with restoration, auditing, and authorized draft saves
+  have been checked. Do not repeat live writes merely to test code.
+
+Description snapshot equality accepts LF/CRLF differences only, since Steam
+normalizes BBCode line endings on Save. Raw strings remain intact in backups.
+Identity, actual text changes, blank lines, and trailing newlines remain strict.
+`AGENTS.md` contains the operational handoff procedure and current workflow
+reminders; account-specific progress remains in the private continuation note.
 
 ## Validation history
 
-- `cargo test`: six tests covering request validation, Unicode, description length,
-  AppID mismatch, template version, and origin validation.
+- `cargo test`: seven tests covering request validation, Unicode, description
+  length, AppID mismatch, template version, origin validation, and saved CRLF
+  equivalence without hiding real content changes.
 - `cargo clippy -- -D warnings`.
 - `./run.sh --headless --video --profile /tmp/steamproject-browser-smoke`: secret
   filtering, rejection of changed types and ambiguous controls, native MP4.
