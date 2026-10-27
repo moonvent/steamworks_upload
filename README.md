@@ -4,19 +4,74 @@ Rust CLI for auditing and editing Steamworks store drafts through your own brows
 session. Includes an interactive terminal and a JSON-lines interface for coding
 agents. No Steam password or partner API key is needed by the program.
 
-## Getting started (Linux x86_64)
+## Как открыть и запустить проект (Linux x86_64)
 
-Install Rust, Chrome/Chromium, Bash, curl, unzip and Python 3. Then:
+Установите Git, Rust/Cargo (stable), Chrome или Chromium, Bash, curl, unzip и
+Python 3. Нужен аккаунт Steamworks с доступом к приложению, которое вы редактируете.
+
+Склонируйте репозиторий и перейдите в папку проекта:
+
+```bash
+git clone git@github.com:moonvent/steamworks_upload.git
+cd steamworks_upload
+```
+
+Для SSH-клонирования ваш SSH-ключ должен быть добавлен в GitHub. Можно использовать
+HTTPS: `git clone https://github.com/moonvent/steamworks_upload.git`.
+
+Откройте эту папку в редакторе или продолжайте в терминале. Установите подходящий
+ChromeDriver и запустите утилиту, заменив `YOUR_APP_ID` числовым AppID своей игры:
 
 ```bash
 ./tools/install_driver.sh
 ./run.sh --app YOUR_APP_ID
 ```
 
-Sign in to Steamworks, complete Steam Guard and open **Edit Store Page** if the
-editor did not open automatically. The utility uses a dedicated browser profile.
-Other platforms can build the Rust binary and use a manually installed matching
-ChromeDriver; the supplied shell installer/launcher target Linux.
+При первом запуске Cargo соберёт программу, а утилита создаст приватный конфиг игры.
+AppID можно найти в списке своих приложений на Steamworks. Реальный AppID не нужно
+вписывать в исходники или файлы примеров.
+
+### Как войти в Steamworks и открыть страницу приложения
+
+1. В открывшемся Chrome войдите в свой аккаунт Steamworks и подтвердите Steam Guard.
+   Вводите пароль и код непосредственно в браузере.
+2. Утилита открывает панель приложения по адресу
+   `https://partner.steamgames.com/apps/landing/YOUR_APP_ID`.
+3. Если после входа редактор не открылся автоматически, на панели игры нажмите
+   **Edit Store Page**. Прямой адрес редактора:
+   `https://partner.steamgames.com/admin/game/edit/YOUR_APP_ID`.
+4. В терминале утилиты выполните `audit`: он проверит вкладки страницы магазина и
+   покажет пропуски. `fields basic` покажет доступные поля вкладки Basic Info.
+
+Это редактор страницы магазина в Steamworks. Для доступа к нему нужны права на
+соответствующее приложение. Утилита использует отдельный профиль Chrome и сохраняет
+вход в приватном каталоге, поэтому при следующих запусках повторный вход может
+не понадобиться. Завершить сессию утилиты можно командой `quit`.
+
+### Как продолжить работу и скачать локализацию
+
+```bash
+cd steamworks_upload
+./run.sh --app YOUR_APP_ID
+```
+
+В терминале запущенной утилиты:
+
+```text
+audit
+export-localization
+```
+
+Экспорт скачивает JSON из **Localization → JSON → All Languages** и сообщает путь
+к файлу. Переводимые тексты и копии для редактирования храните в приватном каталоге,
+вне репозитория. Пустые поля могут отсутствовать в экспорте; после подготовки
+основных текстов выгрузите файл повторно. Импорт локализации пока не автоматизирован.
+
+Команда `save` сохраняет черновик магазина. Публикация выполняется отдельно вручную
+в Steamworks; автоматической публикации в утилите нет.
+
+На других платформах можно собрать Rust-бинарник и вручную установить совместимый
+ChromeDriver; поставляемые скрипты установки и запуска рассчитаны на Linux.
 
 ## Verified page templates and recordings
 
