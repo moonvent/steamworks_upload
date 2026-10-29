@@ -1,6 +1,6 @@
 # Project memory: Steamproject Update
 
-Updated: 2026-10-27. Read `AGENTS.md` and this file when resuming the project.
+Updated: 2026-10-28. Read `AGENTS.md` and this file when resuming the project.
 Use English exclusively in repository files, source code, comments, documentation,
 commit messages, and GitHub content. Account-specific translations belong in
 private storage outside the repository.
@@ -64,6 +64,15 @@ transition delay rather than schema drift.
 - `src/browser.rs`: tabs, audits, fields, Save, explicit file selection, exports.
 - `src/audit.js`: tab state extraction excluding passwords and hidden fields.
 - `src/store.rs`: app config, descriptions, languages, snapshots, backups, fill/save.
+- `src/technical.rs`: stat/achievement definitions, validation, local plans, private
+  backups, native legacy editor adapters, save/readback and offline fixture checks.
+- `src/achievement_icons.rs`: offline PNG/JPEG decoding and achievement icon
+  checks through `./run.sh validate-achievement-icon FILE`; square, minimum 64x64,
+  with advisory 256x256 PNG recommendation.
+- `src/technical_icons.rs`: native achievement icon upload/replacement, validated
+  form identity, private schema/image backups, upload acknowledgement and persisted
+  readback after reload. JSON `achievement-icon-upload` uses api_name, file, gray.
+- `src/technical_fixture.js`: synthetic offline technical-editor fixture.
 - `src/recording.rs`: screenshots, events, HTML timeline, native video.
 - `src/paths.rs`: private directories.
 - `run.sh`: driver on an available localhost port and CLI startup.
@@ -173,3 +182,84 @@ reminders; account-specific progress remains in the private continuation note.
 
 Documentation-only handoff updates do not require another browser test. Follow
 `AGENTS.md` validation requirements when changing code.
+
+## Stats and achievements adapters (2026-10-28)
+
+Separate JSON commands: `stats`, `achievements`, `technical-inspect` (section),
+`stat-plan` / `achievement-plan` (definition), `schema-save`, `schema-discard`,
+and `store-open`. See README for concrete synthetic JSON examples and semantics.
+Plans are local, one record at a time, and cannot mix with pending store edits.
+Save checks both raw schemas against the plan, backs them up privately, calls the
+reviewed native legacy editor, submits that record's Save, reloads and verifies.
+New native controls may allocate server draft records immediately; never call them
+for read-only tests. Failed mutation attempts block retries until explicit discard
+and review of the current draft. Discard does not undo allocated/saved records.
+
+Supported: INT/FLOAT/AVGRATE settings, client/server permissions, localized
+achievement names/descriptions, hidden status and existing-stat progress links.
+Existing stat type changes are rejected. Missing stat numeric constraints are
+cleared; achievement translation maps patch supplied languages and preserve others.
+Sets, bulk import and publication have no write adapters.
+`stat-delete` with api_name deletes one explicitly authorized stat through its
+native Delete control (no confirmation dialog). It rejects achievement-linked
+stats, backs up both schemas and verifies that only the target stat disappeared.
+Delete the explicitly authorized linked achievement first when removing both.
+`achievement-icon-upload` uploads/replaces a single icon on a saved achievement.
+It validates square PNG/JPEG files >=64x64 and <=3,000,000 bytes; supports ~/ paths;
+backs up schemas and icon files; preserves the native Upload callback; accepts
+boolean true or numeric 1 acknowledgement; verifies the persisted CDN URL, image
+and all unaffected schema data after reload. Upload saves the image draft directly.
+Clearing an individual icon is unsupported. Failed attempts block further writes
+until schema-discard and inspection; discard cannot undo uploaded images.
+`achievement-delete` now supports explicitly authorized achievement deletion using
+the reviewed native Delete control and exact confirmation text. It preserves a
+private full-schema backup and verifies after reload that only the target vanished.
+It is immediate draft mutation, not a plan; schema-discard cannot undo it.
+No game integration is added. The all-store-tabs audit still covers store tabs only.
+Templates remain in templates/store.toml, including exact technical paths and
+read-only fetch routes. Technical editor screenshots and journal are enabled;
+login/Steam Guard screens remain excluded.
+
+Authenticated legacy page structure and read routes were inspected without writes.
+Synthetic headless Chrome exercises creation, update, localized values, progress
+and rejection of changed field types. Live schema Save/upload is not authorized as
+a test and must be validated only with specifically approved content changes.
+
+Validation for these adapters: 15 unit tests, Clippy with warnings denied, headless
+Chrome fixture plus native video, and Cargo package list passed. Authenticated
+`stats`, `achievements` and `technical-inspect` reads passed on the legacy editors.
+The achievements heading lives in #appFrame outside #appInfo; the reviewed recipe
+checks that container. No live schema record creation, Save or upload was used for
+validation. No publication occurred.
+
+Authorized technical-editor acceptance uncovered two native DOM details: EditStat
+sets selected on a jQuery wrapper, while the DOM row becomes dirty through the
+type-change handler; new records are now identified by the one added numeric row
+ID plus their reviewed API-name control. Native text inputs omit the type
+attribute, so adapters validate the effective DOM type property. The offline
+fixture now reproduces both details; strict field-type rejection remains enabled.
+
+Authorized native creation of a gameplay stat and a linked achievement has now
+completed through schema-save with private before/after backups and successful
+persisted-value readback after reload. No publication or icon upload was performed.
+The earlier read-only/synthetic-only validation statements describe the initial
+implementation checkpoint; this authorized acceptance supersedes that limitation.
+
+AGENTS.md now contains a standalone agent protocol for listing full draft stats
+and achievements, JSON result paths, fresh reads versus historical snapshots,
+browser ownership, manual-edit verification, and native-editor acceptance details.
+It also records the user's preference to avoid routine confirmations: requested
+content changes include necessary draft Saves, backups and verification. Runtime
+permissions remain separate; no global Codex permission settings were changed.
+
+## Tag Wizard read adapter
+
+The `tags` JSON/interactive command reads the active app's already-open Tag
+Wizard in the current WebDriver window. It does not navigate, select, save or
+publish. The reviewed recipe is in `templates/store.toml`; `src/tags.rs` and
+`src/tags_read.js` validate identity and extract only whitelisted tag data.
+Developer order, community weights, catalog and current-step selections are
+separate. Steam descriptions are unavailable in this adapter, represented as
+null. This is not proof of public visibility. Separate-tab switching, general
+step navigation and tag writes remain future work. An isolated headless fixture
+checks extraction, private-token exclusion, app mismatch and schema rejection.

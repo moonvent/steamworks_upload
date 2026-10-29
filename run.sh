@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 PRIVATE_ROOT="${STEAMPROJECT_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/steamproject-update}"
 mkdir -p "$PRIVATE_ROOT/runtime"
-if [[ "${1:-}" == check || "${1:-}" == init || "${1:-}" == paths ]]; then
+if [[ "${1:-}" == check || "${1:-}" == init || "${1:-}" == paths || "${1:-}" == validate-achievement-icon ]]; then
     exec cargo run -- "$@"
 fi
 if [[ "${1:-}" == --help ]]; then

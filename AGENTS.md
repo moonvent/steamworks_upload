@@ -93,3 +93,144 @@ native Chrome capture (`--video`). Never capture login or Steam Guard pages.
   still need dedicated adapters. Do not silently bypass recipes to handle them.
 - Screenshots/journals and exports may contain confidential information. Keep them
   private, including handoff artifacts; scan staged files before pushing code.
+
+## Stats and achievements
+
+Use `stats` / `achievements` to read the separate legacy editor schemas. Prepare
+one definition with `stat-plan` / `achievement-plan`, review the returned preview,
+then use `schema-save` only for approved definitions. Plans are local; native New
+controls can allocate server draft records, so creation occurs only during Save.
+`schema-discard` does not roll back saved or allocated records. Inspect current
+state after failures; never retry creation blindly. `store-open` returns to the
+store editor after the schema plan is finished. Do not mix pending store edits and
+schema plans. `achievement-delete` with `api_name` immediately deletes one explicitly
+authorized achievement through its native control and exact confirmation dialog,
+with private backups and verification that all other records and stats are unchanged.
+Discard cannot undo deletion. `achievement-icon-upload` uploads/replaces a saved
+achievement's icon using api_name, file and gray (false for achieved, true for
+unachieved). It validates the image and native form, backs up schemas and existing
+images, waits for Upload acknowledgement, and verifies persistence after reload.
+Upload immediately saves an image draft; discard cannot undo it. Do not mix it
+with pending schema/store edits. Inspect after failures before further writes.
+`stat-delete` with api_name immediately deletes an explicitly authorized stat after
+checking that no achievement links to it. It backs up both schemas and verifies
+that only the named stat disappeared. The native stat deletion has no confirmation
+dialog; discard cannot undo it. Remove authorized linked achievements first.
+Individual icon clearing, sets, bulk import and publication are not
+supported. See README for request fields and complete replacement/patch semantics.
+
+### Reading the full schema for another agent
+
+A new agent with access to this checkout, the private storage and the app's
+authenticated browser session can list the current draft stats and achievements.
+No Steamworks API key or additional write authorization is needed for these reads.
+Manual sign-in may be required if the browser session has expired. Repository
+access alone does not grant access to the Steamworks account.
+
+1. Read `PROJECT_MEMORY.md`, run `./run.sh paths`, and read the private
+   `CONTINUATION_PRIVATE.md` and `active-app` from that root. Use the actual app
+   selected there; never infer an AppID from repository examples.
+2. Start `./run.sh --app APP_ID --json --video` with persistent stdin and wait for
+   the `ready` event. Replace APP_ID with the private active app value.
+3. Send these JSON lines in order, waiting for and checking each response:
+
+   ```json
+   {"command":"audit"}
+   {"command":"stats"}
+   {"command":"achievements"}
+   {"command":"quit"}
+   ```
+
+4. Successful responses have `ok: true`. Stats are in `result.schema` (an array).
+   Achievements are in `result.schema.achievements`; configured achievement
+   languages are in `result.schema.languages`. Read the entire returned arrays,
+   including hidden achievements and all returned localized text. These are app
+   configuration records, not a player's unlocked achievements or stat values.
+5. Report exact API names, display names, descriptions, IDs, types, permissions,
+   bounds/defaults, increment-only/aggregation settings, visibility, progress-stat
+   associations and icon availability when present. Keep fields missing in the
+   raw response distinguishable from explicit values. Do not invent data.
+
+`audit` covers store tabs only; it does not replace `stats` or `achievements`.
+The latter commands read the legacy Steamworks configuration draft, including
+unpublished changes saved with Save. They are not proof of what is published live.
+They do not modify definitions, unlock achievements for players or publish.
+Advanced achievement sets have no dedicated adapter; do not claim verified set
+coverage beyond what the legacy endpoint actually returns. A schema mismatch or
+failed response is an error, not an empty list.
+
+The browser requires a single owner. Do not launch concurrent utilities against
+the same profile. Reuse a still-running utility only when it belongs to this
+ongoing conversation; otherwise close it normally before starting another.
+Never copy old driver ports or session identifiers from a handoff note.
+
+For an offline handoff, read the newest applicable private
+`apps/<app-id>/schema-snapshots/<timestamp>/schema.json` referenced by the
+continuation note. It contains `app_id` and `schemas.stats` /
+`schemas.achievements.achievements`. Label snapshots as historical; use a fresh
+browser read when the user asks what is currently configured. List commands return
+JSON but do not automatically export a snapshot: preserve full responses privately
+when asked to record them. Save operations additionally keep private before/after
+backups under `apps/<app-id>/schema-backups/`.
+
+### Editing and acceptance status
+
+- Native creation and draft Save of both a stat and linked achievement have been
+  exercised with explicitly requested content, including readback after reload.
+  Existing manual records were preserved. Exact account-specific definitions,
+  backup paths, remaining icons and game-integration work are in the private note.
+- For stats, supply the complete desired applicable settings. For achievement
+  names/descriptions, supplied language maps patch those languages and preserve
+  the others. A new achievement requires English name and description.
+- A progress stat is optional. An achievement may be unlocked directly by the
+  game; linking a stat is useful for count/progress-based milestones. A linked
+  stat must exist first and have compatible permission and numeric bounds.
+- The utility configures Steamworks definitions; it does not implement game code.
+  Do not modify the separate game project unless requested. Do not claim player
+  unlocks work merely because the definition was saved.
+- Native text inputs may omit the type attribute: validate the effective DOM
+  `type` property. Native stat rows may become `dirty` without a `selected` class;
+  identify the one added row by ID and validate its reviewed field semantics.
+- If the user edits records manually, wait until they report Save is finished,
+  read both schemas, reopen each editor and compare the full responses. Preserve
+  their actual values and tokens; do not substitute earlier suggested values.
+
+## Autonomy and confirmations
+
+The user prefers completing requested work without questions about routine steps.
+Within the explicitly requested scope, proceed with reads, private backups,
+straightforward English translations, technical API names, local edits, required
+checks, draft Saves and reload verification without asking again at each step.
+Make concrete intended content visible in a brief update before entry. Review
+plan previews yourself against the request; showing a preview is not an additional
+user approval gate when the requested change is already authorized.
+
+Use the session's existing authorization. An explicit request to create or edit
+specific store/stat/achievement content authorizes the necessary draft Save;
+do not ask separately whether to save, continue, verify or update handoff notes.
+A read-only request authorizes no remote content changes. Infer routine technical
+details from established context, but never invent gameplay, contacts, assets or
+materially different content to avoid a necessary clarification.
+
+Ask only when a missing decision materially affects the result, instructions
+conflict, a new destructive/publication action lacks authorization, or the runtime
+requires permission. Publication always needs an explicit user request and remains
+unsupported by this utility. Do not treat an earlier creation request as consent
+to delete records, publish drafts or make unrelated changes.
+
+These preferences do not change sandbox, GUI, network or filesystem permissions.
+Use required escalation tools when those boundaries block an authorized action;
+explain that source briefly. Prefer applicable reusable command approvals over
+repeated one-off prompts, without asking for unrestricted interpreter rules.
+
+## Reading tags
+
+Use `tags` only with the active app's Tag Wizard already open as the current
+WebDriver window. It is read-only and does not navigate, change survey choices,
+save or publish. It returns ordered developer tags, community tags, the embedded
+catalog and current-step choices separately. Survey choices may differ from the
+final prioritized tags. Do not infer public visibility from this read.
+Per-tag descriptions are not extracted; null is unavailable data, not a definition.
+Separate-tab switching, step navigation and general tag writes remain unsupported.
+Keep app-specific tag snapshots and explanations in private storage. The headless
+fixture verifies extraction, token filtering, identity and schema rejection.

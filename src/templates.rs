@@ -14,6 +14,60 @@ pub struct Templates {
     pub fields: BTreeMap<String, Field>,
     pub localization: Localization,
     pub localization_download: LocalizationDownload,
+    #[serde(default)]
+    pub technical: BTreeMap<String, TechnicalPage>,
+    pub achievement_icons: Option<AchievementIcons>,
+    pub tag_wizard: Option<TagWizard>,
+}
+#[derive(Clone, Deserialize, serde::Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct TagWizard {
+    pub origin: String,
+    pub path_prefix: String,
+    pub identity: String,
+    pub question: String,
+    pub title: String,
+    pub expected_title: String,
+    pub choices: String,
+    pub adventure: String,
+    pub adventure_label: String,
+    pub adventure_click: String,
+    pub bootstrap_marker: String,
+}
+#[derive(Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AchievementIcons {
+    pub action: String,
+    pub form: String,
+    pub file: String,
+    pub submit: String,
+    pub callback: String,
+    pub max_bytes: u64,
+}
+#[derive(Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TechnicalPage {
+    pub path: String,
+    pub root: String,
+    pub table: String,
+    pub fetch_path: String,
+    pub heading: String,
+    pub heading_root: String,
+    pub row_prefix: String,
+    pub edit_prefix: String,
+    pub create_function: String,
+    pub edit_function: String,
+    pub save: String,
+    pub delete: Option<String>,
+    pub delete_name_cell: Option<String>,
+    pub fields: BTreeMap<String, TechnicalField>,
+}
+#[derive(Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TechnicalField {
+    pub suffix: String,
+    pub tag: String,
+    pub input_type: Option<String>,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -60,6 +114,26 @@ pub struct Localization {
 
 pub fn parse(text: &str) -> Result<Templates> {
     let t: Templates = toml::from_str(text).context("Invalid page templates")?;
+    if let Some(p) = &t.tag_wizard {
+        ensure!(
+            p.origin == "https://partner.steamgames.com"
+                && p.path_prefix == "/taxonomy/tagwizard/"
+                && p.identity == ".appName"
+                && p.bootstrap_marker == "initSurvey(",
+            "Untrusted Tag Wizard recipe"
+        );
+    }
+    if let Some(p) = &t.achievement_icons {
+        ensure!(
+            p.action == "/images/uploadachievement"
+                && p.form == "form[enctype='multipart/form-data']"
+                && p.file == "input[type='file'][name='image']"
+                && p.submit == "input[type='submit'][value='Upload']"
+                && p.callback == "AchievementImageUploadCallbackClosure"
+                && p.max_bytes == 3_000_000,
+            "Untrusted achievement icon upload recipe"
+        );
+    }
     ensure!(t.version == 1, "Unsupported template version {}", t.version);
     ensure!(
         t.page.origin == "https://partner.steamgames.com"
@@ -67,6 +141,57 @@ pub fn parse(text: &str) -> Result<Templates> {
             && t.page.save_path_prefix == "/admin/game/save/",
         "Untrusted page origin or form route in template"
     );
+    for (section, p) in &t.technical {
+        if let Some(selector) = &p.delete_name_cell {
+            ensure!(
+                section == "stats" && selector == "td:nth-child(3)",
+                "Untrusted stat deletion name-cell recipe"
+            );
+        }
+        if let Some(selector) = &p.delete {
+            ensure!(
+                selector == "input[type='submit'][value='Delete']",
+                "Untrusted technical deletion recipe"
+            );
+        }
+        let (root, table, fetch, heading, row, edit, create_fn, edit_fn) = match section.as_str() {
+            "stats" => (
+                "#appStatDisplay",
+                "#statTable",
+                "/apps/fetchstats/{app}",
+                "Stats Configuration",
+                "s",
+                "stat",
+                "PerformNewStat",
+                "EditStat",
+            ),
+            "achievements" => (
+                "#appAchievementDisplay",
+                "#achievementTable",
+                "/apps/fetchachievements/{app}",
+                "Achievement Configuration",
+                "a",
+                "ach",
+                "PerformNewAchievement",
+                "EditAchievement",
+            ),
+            _ => anyhow::bail!("Unknown technical page"),
+        };
+        ensure!(
+            p.path == format!("/apps/{section}/{{app}}")
+                && p.root == root
+                && p.table == table
+                && p.fetch_path == fetch
+                && p.heading == heading
+                && p.heading_root == "#appFrame"
+                && p.row_prefix == row
+                && p.edit_prefix == edit
+                && p.create_function == create_fn
+                && p.edit_function == edit_fn
+                && p.save == "input[type='submit'][value='Save']",
+            "Untrusted technical page recipe"
+        );
+    }
     for f in t.fields.values() {
         ensure!(t.tabs.contains_key(&f.tab), "Field refers to unknown tab");
     }
@@ -239,6 +364,20 @@ mod tests {
         let changed = include_str!("../templates/store.toml")
             .replace("https://partner.steamgames.com", "https://example.invalid");
         assert!(parse(&changed).is_err());
+    }
+    #[test]
+    fn rejects_technical_write_routes_as_read_recipes() {
+        let changed = include_str!("../templates/store.toml")
+            .replace("/apps/fetchstats/{app}", "/apps/deletestat/{app}");
+        assert!(parse(&changed).is_err());
+    }
+    #[test]
+    fn accepts_store_only_custom_templates() {
+        let text = include_str!("../templates/store.toml")
+            .split("# Reviewed against the legacy editor")
+            .next()
+            .unwrap();
+        assert!(parse(text).unwrap().technical.is_empty());
     }
     #[test]
     fn rejects_unknown_template_version() {

@@ -1,6 +1,21 @@
 version = 1
 name = "Steamworks store editor"
 
+# Reviewed on the native Tag Wizard. These choices are local survey state;
+# selecting a checkbox is not proof of a saved or published tag configuration.
+[tag_wizard]
+bootstrap_marker = "initSurvey("
+origin = "https://partner.steamgames.com"
+path_prefix = "/taxonomy/tagwizard/"
+identity = ".appName"
+question = "#q_super_genre"
+title = "#question_title"
+expected_title = "TOP-LEVEL GENRES"
+choices = "#choices input.input_choice"
+adventure = "#q_super_genre input.input_choice[value='21']"
+adventure_label = "Adventure"
+adventure_click = "#q_super_genre label[for='input_choice_2']"
+
 [page]
 origin = "https://partner.steamgames.com"
 path_prefix = "/admin/game/edit/"
@@ -886,3 +901,132 @@ tab = "earlyaccess"
 selector = "textarea[id=\"app_content_earlyaccess_community__textarea\"]"
 tag = "textarea"
 expected_id = "app_content_earlyaccess_community__textarea"
+
+
+# Reviewed against the legacy editor and its public apps.js. No publication recipe.
+[technical.stats]
+path = "/apps/stats/{app}"
+root = "#appStatDisplay"
+table = "#statTable"
+fetch_path = "/apps/fetchstats/{app}"
+heading = "Stats Configuration"
+heading_root = "#appFrame"
+row_prefix = "s"
+edit_prefix = "stat"
+create_function = "PerformNewStat"
+edit_function = "EditStat"
+save = "input[type='submit'][value='Save']"
+delete = "input[type='submit'][value='Delete']"
+delete_name_cell = "td:nth-child(3)"
+
+[technical.stats.fields.type]
+suffix = "stattype"
+tag = "select"
+
+[technical.stats.fields.api_name]
+suffix = "statapiname"
+tag = "input"
+input_type = "text"
+
+[technical.stats.fields.permission]
+suffix = "permission"
+tag = "select"
+
+[technical.stats.fields.increment_only]
+suffix = "incrementonly"
+tag = "input"
+input_type = "checkbox"
+
+[technical.stats.fields.max_change]
+suffix = "maxchange"
+tag = "input"
+input_type = "text"
+
+[technical.stats.fields.min]
+suffix = "min"
+tag = "input"
+input_type = "text"
+
+[technical.stats.fields.max]
+suffix = "max"
+tag = "input"
+input_type = "text"
+
+[technical.stats.fields.window]
+suffix = "windowsize"
+tag = "input"
+input_type = "text"
+
+[technical.stats.fields.default]
+suffix = "default"
+tag = "input"
+input_type = "text"
+
+[technical.stats.fields.aggregated]
+suffix = "aggregated"
+tag = "input"
+input_type = "checkbox"
+
+[technical.stats.fields.display_name]
+suffix = "displayname"
+tag = "input"
+input_type = "text"
+
+# Reviewed against the legacy editor and its public apps.js. No publication recipe.
+[technical.achievements]
+path = "/apps/achievements/{app}"
+root = "#appAchievementDisplay"
+table = "#achievementTable"
+fetch_path = "/apps/fetchachievements/{app}"
+heading = "Achievement Configuration"
+heading_root = "#appFrame"
+row_prefix = "a"
+edit_prefix = "ach"
+create_function = "PerformNewAchievement"
+edit_function = "EditAchievement"
+save = "input[type='submit'][value='Save']"
+delete = "input[type='submit'][value='Delete']"
+
+[achievement_icons]
+action = "/images/uploadachievement"
+form = "form[enctype='multipart/form-data']"
+file = "input[type='file'][name='image']"
+submit = "input[type='submit'][value='Upload']"
+callback = "AchievementImageUploadCallbackClosure"
+max_bytes = 3000000
+
+[technical.achievements.fields.api_name]
+suffix = "apiname"
+tag = "input"
+input_type = "text"
+
+[technical.achievements.fields.permission]
+suffix = "permission"
+tag = "select"
+
+[technical.achievements.fields.hidden]
+suffix = "hidden"
+tag = "input"
+input_type = "checkbox"
+
+[technical.achievements.fields.progress_stat]
+suffix = "progress"
+tag = "select"
+
+[technical.achievements.fields.progress_min]
+suffix = "minval"
+tag = "input"
+input_type = "text"
+
+[technical.achievements.fields.progress_max]
+suffix = "maxval"
+tag = "input"
+input_type = "text"
+
+[technical.achievements.fields.display_name]
+suffix = "displayname"
+tag = "form"
+
+[technical.achievements.fields.description]
+suffix = "description"
+tag = "form"

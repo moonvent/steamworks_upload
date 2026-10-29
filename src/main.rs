@@ -1,7 +1,10 @@
+mod achievement_icons;
 mod browser;
 mod paths;
 mod recording;
 mod store;
+mod tags;
+mod technical;
 mod templates;
 use anyhow::{Context, Result, bail, ensure};
 use clap::{Parser, Subcommand};
@@ -32,6 +35,10 @@ enum Command {
     Init,
     /// Print private storage locations.
     Paths,
+    /// Validate an achievement icon locally without opening a browser.
+    ValidateAchievementIcon {
+        file: PathBuf,
+    },
     Check,
     Open {
         #[arg(long, default_value = "http://127.0.0.1:9515")]
@@ -52,6 +59,33 @@ enum Command {
 #[serde(tag = "command", rename_all = "kebab-case", deny_unknown_fields)]
 enum Request {
     Audit,
+    Tags,
+    TechnicalInspect {
+        section: String,
+    },
+    Stats,
+    Achievements,
+    AchievementDelete {
+        api_name: String,
+    },
+    StatDelete {
+        api_name: String,
+    },
+    AchievementIconUpload {
+        api_name: String,
+        file: PathBuf,
+        #[serde(default)]
+        gray: bool,
+    },
+    StatPlan {
+        definition: technical::Stat,
+    },
+    AchievementPlan {
+        definition: technical::Achievement,
+    },
+    SchemaSave,
+    SchemaDiscard,
+    StoreOpen,
     Read,
     Pull,
     ExportLocalization,
@@ -86,8 +120,10 @@ enum Request {
 }
 #[derive(Default)]
 struct Pending {
+    icon_attempted: bool,
     store: Option<(store::Store, store::Snapshot)>,
     fields: Vec<browser::Change>,
+    schema: Option<technical::Plan>,
 }
 
 fn main() -> Result<()> {
@@ -139,6 +175,10 @@ fn config_path(cli: &Cli) -> Result<PathBuf> {
 }
 async fn run() -> Result<()> {
     let cli = Cli::parse();
+    if let Command::ValidateAchievementIcon { file } = &cli.command {
+        println!("{}", achievement_icons::validate(file)?);
+        return Ok(());
+    }
     if matches!(cli.command, Command::Paths) {
         println!(
             "{}",
@@ -171,6 +211,7 @@ async fn run() -> Result<()> {
             println!("{}", json!({"valid":true,"app_id":config.app_id}));
         }
         Command::Paths => {}
+        Command::ValidateAchievementIcon { .. } => unreachable!(),
         Command::Open {
             webdriver,
             profile,
@@ -245,6 +286,10 @@ fn parse_request(line: &str, json_mode: bool) -> Result<Request> {
             .and_then(Value::as_str)
             .context("Request needs command")?;
         let allowed: &[&str] = match command {
+            "stat-plan" | "achievement-plan" => &["command", "definition"],
+            "technical-inspect" => &["command", "section"],
+            "achievement-delete" | "stat-delete" => &["command", "api_name"],
+            "achievement-icon-upload" => &["command", "api_name", "file", "gray"],
             "fields" | "tab" => &["command", "tab"],
             "get" => &["command", "tab", "field"],
             "set" => &["command", "tab", "field", "value"],
@@ -258,7 +303,13 @@ fn parse_request(line: &str, json_mode: bool) -> Result<Request> {
         return Ok(serde_json::from_value(value)?);
     }
     match line {
+        "store-open" => Ok(Request::StoreOpen),
+        "stats" => Ok(Request::Stats),
+        "achievements" => Ok(Request::Achievements),
+        "schema-save" => Ok(Request::SchemaSave),
+        "schema-discard" => Ok(Request::SchemaDiscard),
         "audit" => Ok(Request::Audit),
+        "tags" => Ok(Request::Tags),
         "read" => Ok(Request::Read),
         "pull" => Ok(Request::Pull),
         "export-localization" => Ok(Request::ExportLocalization),
@@ -309,10 +360,167 @@ async fn handle(
     request: Request,
     pending: &mut Pending,
 ) -> Result<Value> {
+    if pending.icon_attempted {
+        ensure!(
+            matches!(
+                request,
+                Request::Stats
+                    | Request::Achievements
+                    | Request::TechnicalInspect { .. }
+                    | Request::SchemaDiscard
+                    | Request::Help
+                    | Request::Quit
+            ),
+            "Previous icon upload was attempted; schema-discard and inspect current state before another mutation"
+        );
+    }
+    let schema_command = matches!(
+        request,
+        Request::Stats
+            | Request::Achievements
+            | Request::AchievementDelete { .. }
+            | Request::StatDelete { .. }
+            | Request::AchievementIconUpload { .. }
+            | Request::StatPlan { .. }
+            | Request::AchievementPlan { .. }
+            | Request::SchemaSave
+            | Request::SchemaDiscard
+            | Request::TechnicalInspect { .. }
+    );
+    if schema_command {
+        ensure!(
+            pending.store.is_none() && pending.fields.is_empty(),
+            "Save or discard store edits before using technical settings"
+        );
+    } else if !matches!(request, Request::Help | Request::Quit) {
+        ensure!(
+            pending.schema.is_none(),
+            "Use schema-save or schema-discard before returning to store operations"
+        );
+    }
     match request {
+        Request::AchievementIconUpload {
+            api_name,
+            file,
+            gray,
+        } => {
+            ensure!(
+                pending.schema.is_none(),
+                "Save or discard the existing schema plan first"
+            );
+            ensure!(
+                !pending.icon_attempted,
+                "Previous icon upload was attempted; schema-discard, inspect current schemas and backup before another upload"
+            );
+            let result = technical::upload_icon(
+                driver,
+                config.app_id,
+                &api_name,
+                &file,
+                gray,
+                &mut pending.icon_attempted,
+            )
+            .await;
+            if result.is_ok() {
+                pending.icon_attempted = false;
+            }
+            result
+        }
+        Request::StoreOpen => {
+            ensure!(
+                pending.store.is_none() && pending.fields.is_empty(),
+                "Save or discard store edits before navigation"
+            );
+            let t = templates::load()?;
+            driver
+                .goto(format!(
+                    "{}/admin/game/editbyappid/{}",
+                    t.page.origin, config.app_id
+                ))
+                .await?;
+            store::identity(driver, config.app_id).await?;
+            Ok(json!({"editor":"store","app_id":config.app_id}))
+        }
+        Request::Stats => technical::list(driver, config.app_id, "stats").await,
+        Request::Achievements => technical::list(driver, config.app_id, "achievements").await,
+        Request::AchievementDelete { api_name } => {
+            ensure!(
+                pending.schema.is_none(),
+                "Save or discard the existing schema plan first"
+            );
+            technical::delete_achievement(driver, config.app_id, &api_name).await
+        }
+        Request::StatDelete { api_name } => {
+            ensure!(
+                pending.schema.is_none(),
+                "Save or discard the existing schema plan first"
+            );
+            technical::delete_stat(driver, config.app_id, &api_name).await
+        }
+        Request::StatPlan { definition } => {
+            ensure!(
+                pending.schema.is_none(),
+                "Save or discard the existing schema plan first"
+            );
+            let (plan, preview) = technical::plan(
+                driver,
+                config.app_id,
+                technical::Definition::Stats(definition),
+            )
+            .await?;
+            pending.schema = Some(plan);
+            Ok(preview)
+        }
+        Request::AchievementPlan { definition } => {
+            ensure!(
+                pending.schema.is_none(),
+                "Save or discard the existing schema plan first"
+            );
+            let (plan, preview) = technical::plan(
+                driver,
+                config.app_id,
+                technical::Definition::Achievements(definition),
+            )
+            .await?;
+            pending.schema = Some(plan);
+            Ok(preview)
+        }
+        Request::SchemaSave => {
+            let plan = pending.schema.as_mut().context("No pending schema plan")?;
+            let result = technical::save(driver, plan).await?;
+            pending.schema = None;
+            Ok(result)
+        }
+        Request::SchemaDiscard => {
+            if pending.icon_attempted || pending.schema.as_ref().is_some_and(|p| p.attempted) {
+                let section = technical::current_section(driver, config.app_id).await?;
+                technical::identity(driver, config.app_id, section).await?;
+                driver.refresh().await?;
+                technical::page(driver, config.app_id, section).await?;
+            }
+            pending.schema = None;
+            pending.icon_attempted = false;
+            Ok(
+                json!({"plan_discarded":true,"note":"Drops the local plan and unsaved inputs only. Already allocated or saved Steam draft records are not deleted or rolled back."}),
+            )
+        }
         Request::Help => Ok(
-            json!({"commands":["audit","fields basic","tab description","read","pull","export-localization","plan","fill","save","discard","inspect","self-test","quit"],"json_examples":[{"command":"fields","tab":"basic"},{"command":"get","tab":"basic","field":"name:app[name]"},{"command":"set","tab":"basic","field":"name:app[name]","value":"Your Game"}],"save":"Saves a draft only. Publish stays manual."}),
+            json!({"commands":["tags","audit","fields basic","tab description","read","pull","export-localization","plan","fill","save","discard","inspect","self-test","stats","achievements","stat-plan (JSON)","achievement-plan (JSON)","schema-save","schema-discard","technical-inspect (JSON)","store-open","quit"],"json_examples":[{"command":"fields","tab":"basic"},{"command":"get","tab":"basic","field":"name:app[name]"},{"command":"set","tab":"basic","field":"name:app[name]","value":"Your Game"}],"save":"Saves a draft only. Publish stays manual."}),
         ),
+        Request::TechnicalInspect { section } => {
+            ensure!(
+                pending.store.is_none() && pending.fields.is_empty(),
+                "Save or discard pending edits before changing editors"
+            );
+            technical::inspect(driver, config.app_id, &section).await
+        }
+        Request::Tags => {
+            ensure!(
+                pending.store.is_none() && pending.fields.is_empty() && pending.schema.is_none(),
+                "Finish pending edits before reading Tag Wizard"
+            );
+            tags::read(driver, config.app_id).await
+        }
         Request::Audit => browser::audit(driver, config.app_id).await,
         Request::Fields { tab } => browser::fields(driver, config.app_id, &tab).await,
         Request::ExportLocalization => {
@@ -455,6 +663,8 @@ async fn smoke(driver: &WebDriver, video: bool) -> Result<()> {
         templates::field(driver, "name").await.is_err(),
         "Template accepted an ambiguous field"
     );
+    technical::smoke(driver).await?;
+    tags::smoke(driver).await?;
     let recording = if video {
         recording::probe(driver).await?
     } else {
@@ -462,7 +672,7 @@ async fn smoke(driver: &WebDriver, video: bool) -> Result<()> {
     };
     println!(
         "{}",
-        json!({"ok":true,"browser":true,"audit_fixture":true,"recording":recording})
+        json!({"ok":true,"browser":true,"audit_fixture":true,"technical_fixture":true,"tags_fixture":true,"recording":recording})
     );
     Ok(())
 }

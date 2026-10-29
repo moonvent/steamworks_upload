@@ -119,10 +119,18 @@ async fn authenticated_editor(driver: &WebDriver, app: u32) -> bool {
     let Ok(url) = driver.current_url().await else {
         return false;
     };
-    if url.scheme() != "https"
-        || url.host_str() != Some("partner.steamgames.com")
-        || !url.path().starts_with("/admin/game/edit/")
-    {
+    if url.scheme() != "https" || url.host_str() != Some("partner.steamgames.com") {
+        return false;
+    }
+    if let Ok(section) = crate::technical::current_section(driver, app).await {
+        return crate::technical::identity(driver, app, section)
+            .await
+            .is_ok();
+    }
+    if url.path().starts_with("/taxonomy/tagwizard/") {
+        return crate::tags::identity(driver, app).await.is_ok();
+    }
+    if !url.path().starts_with("/admin/game/edit/") {
         return false;
     }
     driver.execute("return window.g_AppId===arguments[0] && !Array.from(document.querySelectorAll('input[type=password]')).some(e=>e.getClientRects().length);",vec![json!(app)]).await.ok().is_some_and(|r|r.json().as_bool()==Some(true))
